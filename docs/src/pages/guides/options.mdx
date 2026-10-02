@@ -1,0 +1,46 @@
+---
+layout: ../../layouts/Layout.astro
+title: Options and theming
+order: 3
+description: Change the attribute, the lock key and the colours.
+---
+
+## Options
+
+```js
+const debug = lilDebugger({
+  attribute: "data-debug", // the attribute to read
+  lockKey: "KeyL", // a KeyboardEvent.code value for Ctrl+Shift+<key>
+  injectStyles: true, // set to false to bring your own CSS
+});
+
+debug.toggle(); // lock or unlock from code
+debug.destroy(); // remove all listeners, the panel, the styles and the root class
+```
+
+Pick a `lockKey` that your browser does not already use with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>.
+
+## Theming
+
+Set these custom properties in your own CSS:
+
+```css
+:root {
+  --lil-debugger-accent: #7c3aed;
+  --lil-debugger-tint: rgb(124 58 237 / 0.12);
+  --lil-debugger-panel-bg: #1e1b2e;
+  --lil-debugger-panel-fg: #fff;
+}
+```
+
+## Bring your own CSS
+
+Set `injectStyles: false`. Then get the default CSS from `styles()` and change it, or write your own:
+
+```js
+import { styles } from "@mrmartineau/lil-debugger";
+
+console.log(styles("data-debug"));
+```
+
+The tool adds the `lil-debugger` class to `<html>` when it is on. The panel has the `lil-debugger-panel` class.

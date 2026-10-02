@@ -37,3 +37,10 @@ const footerSections = buildFooterSections(indexPages);
 >
   <slot />
 </DocsLayout>
+
+<!-- Lil' Debugger runs on every docs page, so you can try it anywhere. -->
+<script>
+  import { lilDebugger } from "../../../src/index.ts";
+
+  lilDebugger();
+</script>

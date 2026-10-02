@@ -2,23 +2,13 @@
 layout: ../../layouts/Layout.astro
 title: Guides
 sectionOrder: 1
-description: Learn how to install and use the package.
+description: Install Lil' Debugger and add it to a project.
 ---
 
 import SectionCards from "../../components/SectionCards.astro";
 
-Welcome to the docs. This site is generated with
-[`@mrmartineau/zui-theme`](https://github.com/mrmartineau/zui) — an Astro docs
-theme built on [ZUI](https://github.com/mrmartineau/zui).
+Lil' Debugger is a tiny dev tool. Add a `data-debug` attribute to any element. Hold <kbd>Ctrl</kbd>+<kbd>Shift</kbd> and the page shows what each element holds.
 
-## How this site works
-
-- Every `.mdx` file under `src/pages/<section>/` becomes a sidebar entry.
-- Each section's `index.mdx` sets the section's `sectionOrder` (and appears at
-  the top of its sidebar group).
-- Set `order` in a page's frontmatter to control its position in the sidebar.
-- Edit `src/site.config.ts` to change the site name, links, and version.
-
-## In this section
+It has no dependencies and works with any framework, or with no framework.
 
 <SectionCards section="guides" />

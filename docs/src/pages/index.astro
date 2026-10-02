@@ -8,20 +8,16 @@ import { site } from "../site.config";
   <section class="hero">
     <h1 class="hero-title">{site.title}</h1>
     <p class="hero-subtitle">{site.description}</p>
+    <p class="hero-subtitle" data-debug="Hello! You found me.">Try it now: hold <kbd>Ctrl</kbd>+<kbd>Shift</kbd> and hover this line.</p>
     <div class="hero-actions">
       <a href="/guides" class="zui-button">Get started</a>
-      <a href="/components" class="zui-button zui-button-variant-outline">Browse components</a>
+      <a href="/demo" class="zui-button zui-button-variant-outline">Try the demo</a>
     </div>
   </section>
 
   <section class="landing-section flow">
     <h2>Guides</h2>
     <SectionCards section="guides" />
-  </section>
-
-  <section class="landing-section flow">
-    <h2>Components</h2>
-    <SectionCards section="components" />
   </section>
 </Layout>
 

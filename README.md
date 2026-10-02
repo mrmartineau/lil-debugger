@@ -1,124 +1,100 @@
-# zed-package-starter
+# Lil' Debugger
 
-A starter template for building TypeScript npm packages with ESM + CJS dual output, Vite+ (`vp`) linting/formatting, Bun testing, automated releases via semantic-release, and a documentation website built with Astro + [ZUI](https://github.com/mrmartineau/zui).
+A tiny dev tool for any framework, or no framework. Add a `data-debug` attribute to any element. Hold <kbd>Ctrl</kbd>+<kbd>Shift</kbd> and the page shows what each element holds.
 
-This repository is meant to be copied and customised for each new package you publish.
+No dependencies. It adds its own styles.
 
-## What's included
+## Install
 
-- pnpm monorepo: the package at the repo root (`src/`), docs site in `docs/`
-- Bundling with `tsdown` (ESM + CJS output with `.d.mts` / `.d.cts` types)
-- Linting, formatting, and type-aware checks with Vite+ (`vp check`)
-- Pre-commit hook (`vp staged`) installed automatically via `vp config`
-- Testing with Bun
-- Automated releases via `semantic-release`, with a generated `CHANGELOG.md`
-- Docs site using [`@mrmartineau/zui-theme`](https://www.npmjs.com/package/@mrmartineau/zui-theme), deployed to Cloudflare Workers
-- GitHub Actions CI: build/test, docs deploy, npm release, supply-chain scan
-
-## How to use this template
-
-1. Create a new repository from this one, or clone/copy it into a new folder.
-2. Update `package.json`:
-   - change `name`
-   - change `description`
-   - update `repository`, `homepage`, and `bugs` fields
-3. Update `docs/src/site.config.ts` (title, description, links) and `docs/wrangler.jsonc` (`name`).
-4. Replace the starter implementation in `src/index.ts` with your package code.
-5. Add any runtime dependencies your package needs.
-6. Install dependencies and start developing.
-7. Add repository secrets in GitHub: `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` (docs deploys). npm needs no secret, see [Releasing](#releasing).
-
-## Install dependencies
-
-```bash
-pnpm install
+```sh
+npm install -D @mrmartineau/lil-debugger
 ```
+
+## Use
+
+```js
+import { lilDebugger } from "@mrmartineau/lil-debugger";
+
+if (import.meta.env.DEV) lilDebugger();
+```
+
+```html
+<div data-debug="user:42">…</div>
+<section data-debug='{"plan":"pro","flags":["beta"]}'>…</section>
+```
+
+| Do this                     | What happens                                             |
+| --------------------------- | -------------------------------------------------------- |
+| Hold Ctrl+Shift             | Show the debug info. Let go to hide it.                  |
+| Ctrl+Shift+L                | Keep it on. Press again to turn it off.                  |
+| Hover a debug element       | The panel shows its label and the labels of its parents. |
+| Alt+click                   | Copy the value of the element to the clipboard.          |
+| Add `?lil-debug` to the URL | Start with it locked on.                                 |
+
+## Features
+
+- Nested labels: the inner label comes first, then each parent with `data-debug`.
+- Element info: tag, `id`, classes and size, for example `<button#save.btn> 120×40`.
+- JSON (JavaScript Object Notation) values show on many lines.
+- When you hover nothing, the panel shows how many debug elements are on the page.
+- Only the innermost hovered element gets a solid outline.
+- It turns off if the window loses focus while you hold the keys, so it never gets stuck on.
+- Values never render as HTML.
+- It does nothing on the server, so it is safe in server-rendered apps.
+- `destroy()` removes all listeners, the panel, the styles and the root class.
+
+## Options
+
+```js
+const debug = lilDebugger({
+  attribute: "data-debug", // the attribute to read
+  lockKey: "KeyL", // a KeyboardEvent.code value for Ctrl+Shift+<key>
+  injectStyles: true, // set to false to bring your own CSS
+});
+
+debug.toggle(); // lock or unlock from code
+debug.destroy(); // remove everything
+```
+
+Theme it with these custom properties:
+
+```css
+:root {
+  --lil-debugger-accent: #7c3aed;
+  --lil-debugger-tint: rgb(124 58 237 / 0.12);
+  --lil-debugger-panel-bg: #1e1b2e;
+  --lil-debugger-panel-fg: #fff;
+}
+```
+
+## Frameworks
+
+React:
+
+```tsx
+import { useEffect } from "react";
+import { lilDebugger } from "@mrmartineau/lil-debugger";
+
+export function LilDebugger() {
+  useEffect(() => lilDebugger().destroy, []);
+  return null;
+}
+```
+
+The docs have examples for plain HTML, Astro, Vue, Svelte and Solid.
 
 ## Development
 
-```bash
-# Build ESM, CJS, and type declarations
-pnpm run build
-
-# Rebuild on file changes
-pnpm run dev
-
-# Check & fix formatting + linting + types
-pnpm run check
-
-# Run tests
-pnpm run test
+```sh
+pnpm install
+pnpm run build      # build the package
+pnpm run test       # bun test, with happy-dom
+pnpm run check      # format, lint and type check
+pnpm run docs:dev   # docs site
 ```
 
-## Documentation site
-
-```bash
-pnpm run docs:dev     # dev server
-pnpm run docs:build   # production build
-pnpm run docs:deploy  # build + deploy to Cloudflare (needs wrangler auth)
-```
-
-Docs pages are MDX files in `docs/src/pages/<section>/` — the sidebar builds itself from the file structure. The package changelog is rendered at `/changelog`. See `AGENTS.md` for the full writing guide.
-
-## Releasing
-
-Run the **NPM Release** workflow from the Actions tab. Version bumps follow [conventional commits](https://www.conventionalcommits.org/):
-
-- `fix:` → patch
-- `feat:` → minor
-- `feat!:` or `BREAKING CHANGE:` → major
-
-Release notes are prepended to `CHANGELOG.md` automatically. `GITHUB_TOKEN` is provided automatically by GitHub Actions.
-
-The release job publishes with npm [trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC), not an `NPM_TOKEN`. npm tokens that bypass 2FA lose publish rights in January 2027, and a token without the bypass fails with `EOTP`. Trusted publishing can only be set up for a package that already exists, so do this once per package:
-
-```bash
-npm login
-pnpm run build
-npm publish                 # first version, by hand, with your 2FA code
-npm trust github <package-name> --repo <owner>/<repo> --file release.yml --allow-publish
-```
-
-After that, every release runs from the workflow.
-
-## Project structure
-
-```text
-.
-├── .github/
-│   └── workflows/
-│       ├── build-test.yml
-│       ├── deploy-docs.yml
-│       ├── release.yml
-│       └── security.yml
-├── docs/               # Astro docs site (@mrmartineau/zui-theme)
-├── src/
-│   ├── index.ts
-│   └── index.test.ts
-├── CHANGELOG.md
-├── package.json
-├── pnpm-workspace.yaml
-├── release.config.mjs
-├── tsconfig.json
-└── vite.config.ts      # Vite+ tooling config (staged, fmt, lint)
-```
-
-## Agent Skill
-
-This repo includes an agent skill (`SKILL.md`) that teaches AI coding agents how to scaffold new npm packages using this template's conventions. Install it with [`npx skills`](https://github.com/vercel-labs/skills):
-
-```bash
-# Interactive — choose your agent(s) and scope
-npx skills add mrmartineau/zed-package-starter
-
-# Install globally for Claude Code
-npx skills add mrmartineau/zed-package-starter -g -a claude-code
-```
-
-Once installed, your agent will automatically use this skill when asked to create or scaffold a new npm package.
+Releases run from the **NPM Release** workflow and use [conventional commits](https://www.conventionalcommits.org/). See `AGENTS.md`.
 
 ## License
 
 [ISC](https://choosealicense.com/licenses/isc/) © [Zander Martineau](https://zander.wtf)
-
-> Made by Zander • [zander.wtf](https://zander.wtf) • [GitHub](https://github.com/mrmartineau/)

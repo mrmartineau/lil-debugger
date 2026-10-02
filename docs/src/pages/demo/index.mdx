@@ -1,0 +1,42 @@
+---
+layout: ../../layouts/Layout.astro
+title: Demo
+sectionOrder: 2
+description: Try Lil' Debugger on this page.
+---
+
+import { Demo } from "@mrmartineau/zui-theme/astro";
+
+Lil' Debugger runs on this site. Hold <kbd>Ctrl</kbd>+<kbd>Shift</kbd> and hover the cards below. Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> to keep it on.
+
+## Nested labels
+
+Hover the button. The panel shows the label of the button, then the label of the card.
+
+<Demo
+  html={`<article class="zui-card" data-debug='{"component":"UserCard","userId":42,"plan":"pro"}'>
+  <div class="zui-card-body">
+    <p>Ada Lovelace</p>
+    <button class="zui-button" data-debug="onClick: openProfile(42)">View profile</button>
+  </div>
+</article>`}
+>
+  <article class="zui-card" data-debug='{"component":"UserCard","userId":42,"plan":"pro"}'>
+    <div class="zui-card-body">
+      <p>Ada Lovelace</p>
+      <button class="zui-button" data-debug="onClick: openProfile(42)">
+        View profile
+      </button>
+    </div>
+  </article>
+</Demo>
+
+## Copy a value
+
+Turn the debugger on. Then <kbd>Alt</kbd>+click the badge to copy its value.
+
+<Demo html={`<span class="zui-badge" data-debug="feature-flag: new-checkout=on">Beta</span>`}>
+  <span class="zui-badge" data-debug="feature-flag: new-checkout=on">
+    Beta
+  </span>
+</Demo>

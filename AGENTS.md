@@ -1,12 +1,12 @@
-# zed-package-starter — agent & contributor guide
+# lil-debugger — agent & contributor guide
 
-Starter template for TypeScript npm packages, plus a documentation website. The
-repo is a pnpm monorepo with two parts:
+Lil' Debugger: a tiny, framework-agnostic dev tool. Hold Ctrl+Shift to see the
+`data-debug` value of any element. The repo is a pnpm monorepo with two parts:
 
-| Part        | Where              | What it is                                                                                   |
-| ----------- | ------------------ | -------------------------------------------------------------------------------------------- |
-| npm package | repo root (`src/`) | The publishable package (`@mrmartineau/npm-package-base`). ESM + CJS dual output via tsdown. |
-| Docs site   | `docs/`            | Astro site using `@mrmartineau/zui-theme`, deployed to Cloudflare Workers.                   |
+| Part        | Where              | What it is                                                                               |
+| ----------- | ------------------ | ---------------------------------------------------------------------------------------- |
+| npm package | repo root (`src/`) | The publishable package (`@mrmartineau/lil-debugger`). ESM + CJS dual output via tsdown. |
+| Docs site   | `docs/`            | Astro site using `@mrmartineau/zui-theme`, deployed to Cloudflare Workers.               |
 
 Root `package.json` is the package itself; `docs` is a private workspace
 package. `pnpm-workspace.yaml` wires them together (it also holds the vite
@@ -33,6 +33,10 @@ Before committing: `pnpm run check && pnpm run build && pnpm run test`, and
 ## The package (`src/`)
 
 - Source in `src/index.ts`, tests co-located as `src/*.test.ts` (Bun test).
+- Tests need a DOM: `bunfig.toml` preloads `src/test-setup.ts`, which
+  registers happy-dom globals.
+- The CSS lives in `styles()` in `src/index.ts` and is injected at runtime, so
+  the package is one import. Keep the theming custom properties stable.
 - `pnpm run build` emits ESM (`index.mjs`), CJS (`index.cjs`), and `.d.ts`
   types into `dist/`. Only `dist/` is published (`files` field).
 - TypeScript config in `tsconfig.json`; lint/format/typecheck via Vite+
@@ -97,7 +101,7 @@ automatically. Useful theme components: `Demo` (live preview + tabbed source),
 - `build-test.yml` — every PR/push to main: `vp check`, package build, docs
   build, bun tests.
 - `deploy-docs.yml` — push to main touching `docs/**` (or manual dispatch):
-  builds docs and deploys the `zed-package-starter-docs` Worker via
+  builds docs and deploys the `lil-debugger-docs` Worker via
   wrangler-action. Needs `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` repo
   secrets. Wrangler config: `docs/wrangler.jsonc` (assets served from
   `docs/dist/client`).
@@ -122,19 +126,12 @@ CI installs with `--frozen-lockfile`: if you change any `package.json`, run
 - **Changelog**: `docs/src/pages/changelog.astro` imports the root
   `CHANGELOG.md` — don't delete that file; semantic-release prepends release
   notes to it.
-- **Worker name** lives in `docs/wrangler.jsonc` (`zed-package-starter-docs`).
+- **Worker name** lives in `docs/wrangler.jsonc` (`lil-debugger-docs`).
   Renaming it deploys a new Worker instead of updating the existing one.
 - **Docs build output** goes to `docs/dist/client` (the Cloudflare adapter
   splits client/server); `wrangler.jsonc` points there — don't change one
   without the other.
-- **Package rename**: when using this template for a real package, update root
-  `package.json` (`name`, `description`, repo URLs), `docs/src/site.config.ts`,
-  and the npm link in this file.
+- **Docs demo**: `docs/src/layouts/Layout.astro` imports `src/index.ts`
+  directly, so the debugger runs on every docs page without a package build.
 - **semantic-release** commits the version bump back to `main` with
   `[skip ci]` — don't hand-edit `version` in root `package.json`.
-
-## Using this repo as a template
-
-See `README.md` for the copy-and-customise checklist, and `SKILL.md` for the
-agent skill that scaffolds new packages from these conventions
-(`npx skills add mrmartineau/npm-package-base`).

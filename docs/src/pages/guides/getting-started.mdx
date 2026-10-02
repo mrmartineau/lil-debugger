@@ -2,28 +2,58 @@
 layout: ../../layouts/Layout.astro
 title: Getting started
 order: 1
-description: Install your package and add it to a project.
+description: Install the package and add debug info to your elements.
 ---
 
 ## Install
 
 ```sh
-npm install your-package
+npm install -D @mrmartineau/lil-debugger
+```
+
+## Turn it on
+
+Call `lilDebugger()` once, in the browser. It adds its own styles.
+
+```js
+import { lilDebugger } from "@mrmartineau/lil-debugger";
+
+if (import.meta.env.DEV) lilDebugger();
+```
+
+Load it only in development. This example uses the Vite `import.meta.env.DEV` flag. Change it to your build tool's flag.
+
+## Add debug info
+
+Put any string in a `data-debug` attribute:
+
+```html
+<div data-debug="user:42">…</div>
+<section data-debug='{"plan":"pro","flags":["beta"]}'>…</section>
+```
+
+From a component, pass any value as a string:
+
+```jsx
+<Card data-debug={JSON.stringify({ id, status })} />
 ```
 
 ## Use it
 
-Document your package's API here. Write standard Markdown, drop in code blocks,
-and they'll be syntax-highlighted automatically.
+| Do this                                       | What happens                                             |
+| --------------------------------------------- | -------------------------------------------------------- |
+| Hold <kbd>Ctrl</kbd>+<kbd>Shift</kbd>         | Show the debug info. Let go to hide it.                  |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> | Keep it on. Press again to turn it off.                  |
+| Hover a debug element                         | The panel shows its label and the labels of its parents. |
+| <kbd>Alt</kbd>+click                          | Copy the value of the element to the clipboard.          |
+| Add `?lil-debug` to the URL                   | Start with it locked on. Good for sharing a link.        |
 
-```ts
-import { thing } from "your-package";
+## What the panel shows
 
-thing();
-```
+- The value. JSON (JavaScript Object Notation) objects and arrays show on many lines.
+- The element: tag, `id`, classes and size, for example `<button#save.btn> 120×40`.
+- When you hover nothing: how many debug elements are on the page.
 
-## Add a new page
+All debug elements get a dashed outline. The innermost hovered one gets a solid outline.
 
-Create a new `.mdx` file anywhere under `src/pages/<section>/` and it shows up in
-the sidebar automatically. For example, `src/pages/guides/configuration.mdx`
-adds a "Configuration" entry to the Guides section.
+The panel uses `textContent`, so a value can never inject HTML.
