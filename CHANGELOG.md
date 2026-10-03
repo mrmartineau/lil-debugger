@@ -1,3 +1,9 @@
+# [1.1.0](https://github.com/mrmartineau/lil-debugger/compare/v1.0.0...v1.1.0) (2026-10-03)
+
+### Features
+
+- turn the debugger off with Escape ([472fbba](https://github.com/mrmartineau/lil-debugger/commit/472fbba15ee2bca14006094db8c1476eb6b5f4a3))
+
 # 1.0.0 (2026-10-03)
 
 ### Bug Fixes
