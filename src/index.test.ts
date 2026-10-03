@@ -65,6 +65,16 @@ describe("lilDebugger", () => {
     expect(panel()?.querySelector("img")).toBeNull();
   });
 
+  test("comes back after a client-side router swaps the page", () => {
+    debug = lilDebugger();
+    document.head.innerHTML = "";
+    document.body.innerHTML = `<div data-debug="new page"></div>`;
+    key("keydown", { ctrlKey: true, shiftKey: true });
+    expect(panel()?.hidden).toBe(false);
+    expect(panel()?.textContent).toBe("1 debug elements");
+    expect(document.head.querySelector("style")).not.toBeNull();
+  });
+
   test("destroy removes everything", () => {
     debug = lilDebugger();
     debug.toggle();

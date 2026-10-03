@@ -109,15 +109,22 @@ export function lilDebugger({
 
   const style = document.createElement("style");
   style.textContent = styles(attribute);
-  if (injectStyles) document.head.append(style);
 
   const panel = document.createElement("div");
   panel.className = "lil-debugger-panel";
-  document.body.append(panel);
 
   const isOn = () => locked || peeking;
 
+  // Client-side routers (Astro's ClientRouter, Turbo, htmx boost) swap <head>
+  // and <body> on navigation, so put the style and panel back when they go.
+  const attach = () => {
+    if (injectStyles && !style.isConnected) document.head.append(style);
+    if (!panel.isConnected) document.body.append(panel);
+    if (!hovered?.isConnected) hovered = null;
+  };
+
   const render = () => {
+    attach();
     root.classList.toggle(ROOT_CLASS, isOn());
     panel.hidden = !isOn();
     if (!isOn()) return;
