@@ -8,7 +8,7 @@ export interface LilDebuggerOptions {
 }
 
 export interface LilDebugger {
-  /** Lock or unlock the debugger. */
+  /** Lock or unlock the debugger. Does nothing after `destroy()`. */
   toggle(): void;
   /** Remove all listeners, the panel, the styles and the root class. */
   destroy(): void;
@@ -82,6 +82,14 @@ export function styles(attribute = "data-debug"): string {
   padding-top: 0.5rem;
   border-top: 1px solid rgb(255 255 255 / 0.2);
 }
+.lil-debugger-panel[data-clipped]::after {
+  content: "… Alt+click to copy the full value";
+  position: sticky;
+  bottom: 0;
+  display: block;
+  background: var(--lil-debugger-panel-bg);
+  color: var(--lil-debugger-accent);
+}
 .lil-debugger-panel[data-copied]::before {
   content: "Copied ✓";
   display: block;
@@ -91,7 +99,7 @@ export function styles(attribute = "data-debug"): string {
 
 /**
  * Hold Ctrl+Shift to see the `data-debug` value of any element.
- * Ctrl+Shift+L locks it on. Alt+click copies a value. `?lil-debug` in the URL starts it locked.
+ * Ctrl+Shift+L locks it on. Escape turns it off. Alt+click copies a value. `?lil-debug` in the URL starts it locked.
  */
 export function lilDebugger({
   attribute = "data-debug",
@@ -105,6 +113,9 @@ export function lilDebugger({
   const selector = `[${attribute}]`;
   let locked = new URLSearchParams(location.search).has(URL_PARAM);
   let peeking = false;
+  // Escape turns peeking off until Ctrl+Shift are let go.
+  let escaped = false;
+  let destroyed = false;
   let hovered: Element | null = null;
 
   const style = document.createElement("style");
@@ -124,6 +135,7 @@ export function lilDebugger({
   };
 
   const render = () => {
+    if (destroyed) return;
     attach();
     root.classList.toggle(ROOT_CLASS, isOn());
     panel.hidden = !isOn();
@@ -151,6 +163,7 @@ export function lilDebugger({
         return item;
       }),
     );
+    panel.toggleAttribute("data-clipped", panel.scrollHeight > panel.clientHeight);
   };
 
   const toggle = () => {
@@ -159,11 +172,18 @@ export function lilDebugger({
   };
 
   const onKey = (e: KeyboardEvent) => {
-    if (e.type === "keydown" && e.ctrlKey && e.shiftKey && e.code === lockKey) {
+    const held = e.ctrlKey && e.shiftKey;
+    if (e.type === "keydown" && e.key === "Escape" && isOn()) {
+      locked = false;
+      escaped = true;
+    }
+    // e.repeat: holding the keys down must not toggle the lock on and off.
+    if (e.type === "keydown" && held && e.code === lockKey && !e.repeat) {
       e.preventDefault();
       locked = !locked;
     }
-    peeking = e.ctrlKey && e.shiftKey;
+    if (!held) escaped = false;
+    peeking = held && !escaped;
     render();
   };
 
@@ -181,7 +201,8 @@ export function lilDebugger({
   const onClick = (e: MouseEvent) => {
     if (!isOn() || !e.altKey || !(e.target instanceof Element)) return;
     const el = e.target.closest(selector);
-    if (!el) return;
+    // No clipboard (an insecure context, for example): let the click through.
+    if (!el || !navigator.clipboard?.writeText) return;
     e.preventDefault();
     e.stopPropagation();
     navigator.clipboard
@@ -205,6 +226,7 @@ export function lilDebugger({
   return {
     toggle,
     destroy() {
+      destroyed = true;
       controller.abort();
       panel.remove();
       style.remove();

@@ -29,6 +29,7 @@ if (import.meta.env.DEV) lilDebugger();
 | --------------------------- | -------------------------------------------------------- |
 | Hold Ctrl+Shift             | Show the debug info. Let go to hide it.                  |
 | Ctrl+Shift+L                | Keep it on. Press again to turn it off.                  |
+| Escape                      | Turn it off.                                             |
 | Hover a debug element       | The panel shows its label and the labels of its parents. |
 | Alt+click                   | Copy the value of the element to the clipboard.          |
 | Add `?lil-debug` to the URL | Start with it locked on.                                 |
@@ -41,6 +42,7 @@ if (import.meta.env.DEV) lilDebugger();
 - When you hover nothing, the panel shows how many debug elements are on the page.
 - Only the innermost hovered element gets a solid outline.
 - It turns off if the window loses focus while you hold the keys, so it never gets stuck on.
+- If the panel is too tall, it says so. Alt+click copies the full value.
 - Values never render as HTML.
 - It does nothing on the server, so it is safe in server-rendered apps.
 - `destroy()` removes all listeners, the panel, the styles and the root class.

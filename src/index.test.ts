@@ -75,6 +75,47 @@ describe("lilDebugger", () => {
     expect(document.head.querySelector("style")).not.toBeNull();
   });
 
+  test("Escape turns it off, even while Ctrl+Shift is held", () => {
+    debug = lilDebugger();
+    debug.toggle();
+    key("keydown", { ctrlKey: true, shiftKey: true, key: "Escape" });
+    expect(isOn()).toBe(false);
+    key("keyup", { ctrlKey: true, shiftKey: true, key: "Escape" });
+    expect(isOn()).toBe(false);
+    key("keyup", { key: "Shift" });
+    key("keydown", { ctrlKey: true, shiftKey: true, key: "Shift" });
+    expect(isOn()).toBe(true);
+  });
+
+  test("a held-down lock key does not toggle again", () => {
+    debug = lilDebugger();
+    key("keydown", { ctrlKey: true, shiftKey: true, code: "KeyL" });
+    key("keydown", { ctrlKey: true, shiftKey: true, code: "KeyL", repeat: true });
+    key("keyup", { code: "ShiftLeft" });
+    expect(isOn()).toBe(true);
+  });
+
+  test("Alt+click is not blocked when there is no clipboard", () => {
+    const clipboard = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+    Object.defineProperty(navigator, "clipboard", { value: undefined, configurable: true });
+    document.body.innerHTML = `<a id="x" href="#" data-debug="v"></a>`;
+    debug = lilDebugger();
+    debug.toggle();
+    const click = new MouseEvent("click", { altKey: true, bubbles: true, cancelable: true });
+    document.getElementById("x")?.dispatchEvent(click);
+    expect(click.defaultPrevented).toBe(false);
+    if (clipboard) Object.defineProperty(navigator, "clipboard", clipboard);
+    else delete (navigator as { clipboard?: unknown }).clipboard;
+  });
+
+  test("toggle after destroy does nothing", () => {
+    debug = lilDebugger();
+    debug.destroy();
+    debug.toggle();
+    expect(isOn()).toBe(false);
+    expect(panel()).toBeNull();
+  });
+
   test("destroy removes everything", () => {
     debug = lilDebugger();
     debug.toggle();
