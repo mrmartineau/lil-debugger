@@ -9,7 +9,7 @@
     "devtools",
     "framework-agnostic"
   ],
-  "homepage": "https://github.com/mrmartineau/lil-debugger",
+  "homepage": "https://zander.wtf/lil-debugger",
   "bugs": {
     "url": "https://github.com/mrmartineau/lil-debugger/issues"
   },
@@ -49,9 +49,6 @@
     "build": "tsdown src/index.ts --format cjs,esm --target es2020 --dts --sourcemap --clean",
     "check": "vp check --fix",
     "dev": "tsdown src/index.ts --format cjs,esm --target es2020 --dts --sourcemap --watch",
-    "docs:build": "pnpm --filter docs build",
-    "docs:dev": "pnpm --filter docs dev",
-    "docs:deploy": "pnpm --filter docs deploy",
     "prepare": "vp config",
     "release": "semantic-release",
     "test": "bun test"

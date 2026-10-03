@@ -1,5 +1,7 @@
 # Lil' Debugger
 
+Docs and demo: [zander.wtf/lil-debugger](https://zander.wtf/lil-debugger)
+
 A tiny dev tool for any framework, or no framework. Add a `data-debug` attribute to any element. Hold <kbd>Ctrl</kbd>+<kbd>Shift</kbd> and the page shows what each element holds.
 
 No dependencies. It adds its own styles.
@@ -81,7 +83,7 @@ export function LilDebugger() {
 }
 ```
 
-The docs have examples for plain HTML, Astro, Vue, Svelte and Solid.
+The [docs](https://zander.wtf/lil-debugger) have examples for plain HTML, Astro, Vue, Svelte and Solid.
 
 ## Development
 
@@ -90,7 +92,6 @@ pnpm install
 pnpm run build      # build the package
 pnpm run test       # bun test, with happy-dom
 pnpm run check      # format, lint and type check
-pnpm run docs:dev   # docs site
 ```
 
 Releases run from the **NPM Release** workflow and use [conventional commits](https://www.conventionalcommits.org/). See `AGENTS.md`.
