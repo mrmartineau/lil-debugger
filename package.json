@@ -1,6 +1,6 @@
 {
   "name": "@mrmartineau/lil-debugger",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A tiny, framework-agnostic dev tool. Hold Ctrl+Shift to see the data-debug value of any element.",
   "keywords": [
     "data-attribute",
